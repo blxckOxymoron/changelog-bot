@@ -6,7 +6,6 @@ import {
   type ColorResolvable,
   time,
   TimestampStyles,
-  AttachmentBuilder,
 } from "discord.js";
 import { getGuildAndChangelog } from "../db/guild";
 import type { Changelog } from "@prisma/client";
@@ -30,7 +29,7 @@ export const titleImages = readdirSync("./media/changelog-title")
   .map(titleName => ({
     name: titleName,
     value: `@local/${titleName}`,
-    path: `./media/changelog-title/${titleName}.png`,
+    url: `https://raw.githubusercontent.com/blxckOxymoron/changelog-bot/main/media/changelog-title/${titleName}.png`,
   }));
 
 export async function generateChangelogEmbeds(changelog: Changelog): Promise<EmbedBuilder[]> {
@@ -60,13 +59,10 @@ export async function generateChangelogEmbeds(changelog: Changelog): Promise<Emb
   const titleImageEmbed = new EmbedBuilder().setColor(changelog.color as ColorResolvable);
 
   if (changelog.titleImage.startsWith("@local/")) {
-    const localPath = titleImages.find(
-      titleImage => titleImage.value === changelog.titleImage
-    )?.path;
-    if (localPath === undefined) titleImageEmbed.setTitle("Title image not found");
+    const localImage = titleImages.find(titleImage => titleImage.value === changelog.titleImage);
+    if (localImage === undefined) titleImageEmbed.setTitle("Title image not found");
     else {
-      // const attachment = new AttachmentBuilder(localPath);
-      titleImageEmbed.setImage(`attachment://${attachment.name}.png`);
+      titleImageEmbed.setImage(localImage.url);
     }
   } else {
     titleImageEmbed.setImage(changelog.titleImage);
