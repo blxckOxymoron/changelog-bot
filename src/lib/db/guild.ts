@@ -28,7 +28,7 @@ export async function getGuildAndChangelog(guildId: string) {
             emoji: "🟩",
           },
           {
-            name: "updates",
+            name: "updated",
             emoji: "🟨",
           },
           {

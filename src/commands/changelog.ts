@@ -119,6 +119,12 @@ export class UserCommand extends Subcommand {
                 .setName("title_image")
                 .setDescription("the image to use for the title of changelogs")
             )
+            .addStringOption(opt =>
+              opt
+                .setRequired(false)
+                .setName("end_of_week_message")
+                .setDescription("the message to send at the end of the week")
+            )
         )
         .addSubcommandGroup(group =>
           group
@@ -295,14 +301,15 @@ export class UserCommand extends Subcommand {
   public async changelogEdit(interaction: Subcommand.ChatInputCommandInteraction) {
     if (!interaction.inGuild()) return;
 
-    const changelogChannel = interaction.options.getChannel("channel", false);
-    const changelogTitle = interaction.options.getString("title", false);
-    const changelogColor = interaction.options.getString("color", false);
-    const changelogTitleImage = interaction.options.getString("title_image", false);
+    const channel = interaction.options.getChannel("channel", false);
+    const title = interaction.options.getString("title", false);
+    const color = interaction.options.getString("color", false);
+    const titleImage = interaction.options.getString("title_image", false);
+    const endOfWeekMessage = interaction.options.getString("end_of_week_message", false);
 
     const dbGuild = await getGuildAndChangelog(interaction.guildId);
 
-    if (!(changelogChannel || changelogTitle || changelogColor || changelogTitleImage)) {
+    if (!(channel || title || color || titleImage || endOfWeekMessage)) {
       await interaction.reply({
         content: "No new data provided!",
         ephemeral: true,
@@ -312,11 +319,11 @@ export class UserCommand extends Subcommand {
     }
 
     if (
-      changelogColor &&
+      color &&
       !(
-        (objectKeys(Colors) as string[]).includes(changelogColor) ||
-        changelogColor === "Random" ||
-        /^#[0-9A-F]{6}$/i.test(changelogColor)
+        (objectKeys(Colors) as string[]).includes(color) ||
+        color === "Random" ||
+        /^#[0-9A-F]{6}$/i.test(color)
       )
     ) {
       await interaction.reply({
@@ -328,11 +335,10 @@ export class UserCommand extends Subcommand {
     }
 
     if (
-      changelogTitleImage &&
+      titleImage &&
       !(
-        /^((\w+:\/\/)[-a-zA-Z0-9:@;?&=\/%\+\.\*!'\(\),\$_\{\}\^~\[\]`#|]+)$/i.test(
-          changelogTitleImage
-        ) || titleImages.some(img => img.value === changelogTitleImage)
+        /^((\w+:\/\/)[-a-zA-Z0-9:@;?&=\/%\+\.\*!'\(\),\$_\{\}\^~\[\]`#|]+)$/i.test(titleImage) ||
+        titleImages.some(img => img.value === titleImage)
       )
     ) {
       await interaction.reply({
@@ -343,20 +349,21 @@ export class UserCommand extends Subcommand {
       return;
     }
 
-    const result = await prisma.changelog.update({
+    await prisma.changelog.update({
       where: {
         guildId: dbGuild.id,
       },
       data: {
-        channelId: changelogChannel?.id ?? undefined,
-        title: changelogTitle ?? undefined,
-        color: changelogColor ?? undefined,
-        titleImage: changelogTitleImage ?? undefined,
+        channelId: channel?.id ?? undefined,
+        title: title ?? undefined,
+        color: color ?? undefined,
+        titleImage: titleImage ?? undefined,
+        endOfWeekMessage: endOfWeekMessage ?? undefined,
       },
     });
 
     await interaction.reply({
-      content: `Changelog settings updated! Changelog will be sent with title __${result.title}__, image __${result.titleImage}__ and color __${result.color}__ in <#${result.channelId}>!`,
+      content: `Changelog settings updated!`,
       ephemeral: true,
     });
 

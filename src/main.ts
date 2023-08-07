@@ -4,6 +4,7 @@ import { config } from "./lib/config";
 
 import "@sapphire/plugin-logger/register";
 import "@sapphire/plugin-subcommands/register";
+import { startRespondToChangelogJob, startSendNewChangelogMessageJob } from "./lib/changelog/cron";
 
 const client = new SapphireClient({
   intents: [GatewayIntentBits.GuildMessages],
@@ -25,6 +26,9 @@ async function main() {
   await client.login(config.CLIENT_TOKEN);
 
   container.logger.info("Logged in!", "Invite:", generateInvite());
+
+  startRespondToChangelogJob();
+  startSendNewChangelogMessageJob();
 }
 
 main();
