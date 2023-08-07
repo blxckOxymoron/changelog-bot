@@ -39,13 +39,7 @@ export async function sendNewChangelogMessage() {
     // clear messages
     await prisma.changeMessage.deleteMany({
       where: {
-        category: {
-          guildId: changelog.guildId,
-        },
-        changeType: {
-          guildId: changelog.guildId, // double as allways i guess
-          // TODO add message -> guild relation
-        },
+        guildId: changelog.guildId,
       },
     });
 

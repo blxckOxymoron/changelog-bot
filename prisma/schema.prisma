@@ -16,8 +16,9 @@ model Guild {
   changelog          Changelog?
   archivedChangelogs ArchivedChangelog[]
 
-  categories  Category[]
-  changeTypes ChangeType[]
+  categories     Category[]
+  changeTypes    ChangeType[]
+  changeMessages ChangeMessage[]
 
   createdAt DateTime @default(now())
 }
@@ -68,6 +69,9 @@ model ChangeMessage {
   category   Category @relation(fields: [categoryId], references: [id])
   categoryId String
 
+  guild   Guild  @relation(fields: [guildId], references: [id])
+  guildId String
+
   message   String
   authorId  String
   createdAt DateTime @default(now())
@@ -79,5 +83,6 @@ model ArchivedChangelog {
   guild   Guild  @relation(fields: [guildId], references: [id])
   guildId String
 
-  embed String
+  embed     String
+  createdAt DateTime @default(now())
 }

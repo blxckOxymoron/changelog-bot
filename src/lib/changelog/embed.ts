@@ -11,7 +11,6 @@ import { getGuildAndChangelog } from "../db/guild";
 import type { Changelog } from "@prisma/client";
 import { prisma } from "../prisma";
 import { container } from "@sapphire/framework";
-import { readdirSync } from "fs";
 
 function getWeekDates() {
   const today = new Date();
@@ -24,13 +23,11 @@ function getWeekDates() {
   return [monday, sunday];
 }
 
-export const titleImages = readdirSync("./media/changelog-title")
-  .map(file => file.replace(".png", ""))
-  .map(titleName => ({
-    name: titleName,
-    value: `@local/${titleName}`,
-    url: `https://raw.githubusercontent.com/blxckOxymoron/changelog-bot/main/media/changelog-title/${titleName}.png`,
-  }));
+export const titleImages = ["minecraft", "modern"].map(titleName => ({
+  name: titleName,
+  value: `@local/${titleName}`,
+  url: `https://raw.githubusercontent.com/blxckOxymoron/changelog-bot/main/media/changelog-title/${titleName}.png`,
+}));
 
 export async function generateChangelogEmbeds(changelog: Changelog): Promise<EmbedBuilder[]> {
   const changeTypes = await prisma.changeType.findMany({

@@ -615,6 +615,7 @@ export class UserCommand extends Subcommand {
     await prisma.changeMessage.create({
       data: {
         message,
+        guildId: dbGuild.id,
         categoryId: category.id,
         changeTypeId: changeType.id,
         authorId: interaction.user.id,
@@ -640,13 +641,7 @@ export class UserCommand extends Subcommand {
       .findUnique({
         where: {
           id: messageId,
-          category: {
-            guildId: dbGuild.id,
-          },
-          changeType: {
-            // kinda double check, but it's fine
-            guildId: dbGuild.id,
-          },
+          guildId: dbGuild.id,
         },
       })
       .catch(error => ({ error }));
@@ -744,13 +739,7 @@ export class UserCommand extends Subcommand {
       .findUnique({
         where: {
           id: messageId,
-          category: {
-            guildId: dbGuild.id,
-          },
-          changeType: {
-            // kinda double check, but it's fine
-            guildId: dbGuild.id,
-          },
+          guildId: dbGuild.id,
         },
       })
       .catch(error => ({ error }));
@@ -931,12 +920,7 @@ export class UserCommand extends Subcommand {
       case "new_message_id": {
         const messages = await prisma.changeMessage.findMany({
           where: {
-            category: {
-              guildId: interaction.guildId,
-            },
-            changeType: {
-              guildId: interaction.guildId,
-            },
+            guildId: interaction.guildId,
           },
           include: {
             changeType: true,
