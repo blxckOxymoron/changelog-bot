@@ -1,0 +1,83 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Guild {
+  id String @id // discord id
+
+  changelog          Changelog?
+  archivedChangelogs ArchivedChangelog[]
+
+  categories  Category[]
+  changeTypes ChangeType[]
+
+  createdAt DateTime @default(now())
+}
+
+model Changelog {
+  id String @id @default(cuid())
+
+  guild   Guild  @relation(fields: [guildId], references: [id])
+  guildId String @unique
+
+  channelId        String?
+  lastMessageId    String?
+  endOfWeekMessage String  @default("See what's new this week!")
+  title            String  @default("Changelog")
+  titleImage       String  @default("@local/modern")
+  color            String  @default("#ffffff")
+}
+
+model Category {
+  id String @id @default(cuid())
+
+  guild   Guild  @relation(fields: [guildId], references: [id])
+  guildId String
+
+  messages ChangeMessage[]
+
+  name String
+}
+
+model ChangeType {
+  id String @id @default(cuid())
+
+  guild   Guild  @relation(fields: [guildId], references: [id])
+  guildId String
+
+  messages ChangeMessage[]
+
+  name  String
+  emoji String
+}
+
+model ChangeMessage {
+  id String @id @default(cuid())
+
+  changeType   ChangeType @relation(fields: [changeTypeId], references: [id])
+  changeTypeId String
+
+  category   Category @relation(fields: [categoryId], references: [id])
+  categoryId String
+
+  message   String
+  authorId  String
+  createdAt DateTime @default(now())
+}
+
+model ArchivedChangelog {
+  id String @id @default(cuid())
+
+  guild   Guild  @relation(fields: [guildId], references: [id])
+  guildId String
+
+  embed String
+}
