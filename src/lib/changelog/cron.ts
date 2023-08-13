@@ -8,7 +8,7 @@ export function startSendNewChangelogMessageJob() {
   if (startSendNewChangelogMessageStarted)
     return container.logger.warn("Send new changelog message job already started.");
 
-  const schedule = "0 0 * * 0"; // At 00:00 on Sunday.
+  const schedule = "0 0 * * 1"; // At 00:00 on Monday.
 
   new CronJob(schedule, sendNewChangelogMessage, null, true, "Europe/Berlin");
   startSendNewChangelogMessageStarted = true;
